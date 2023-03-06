@@ -1,5 +1,5 @@
-# From https://github.com/nvim-lua/kickstart.nvim/raw/master/init.lua
-# Details https://www.youtube.com/watch?v=stqUbv-5u2s
+-- From https://github.com/nvim-lua/kickstart.nvim/raw/master/init.lua
+-- Details https://www.youtube.com/watch?v=stqUbv-5u2s
 
 --[[
 
