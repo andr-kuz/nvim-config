@@ -1,5 +1,5 @@
 -- From https://github.com/nvim-lua/kickstart.nvim/raw/master/init.lua
--- Details https://www.youtube.com/watch?v=stqUbv-5u2s
+-- Review https://www.youtube.com/watch?v=stqUbv-5u2s
 
 --[[
 
@@ -45,6 +45,9 @@ P.S. You can delete this when you're done too. It's your config now :)
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
+-- Use zsh as a default shell
+vim.opt.shell = '/usr/bin/zsh'
+
 -- Install package manager
 --    https://github.com/folke/lazy.nvim
 --    `:help lazy.nvim.txt` for more info
@@ -68,13 +71,34 @@ vim.opt.rtp:prepend(lazypath)
 --    as they will be available in your neovim runtime.
 require('lazy').setup({
   -- NOTE: First, some plugins that don't require any configuration
+  'windwp/nvim-autopairs',
+  'kenn7/vim-arsync',
+  'mattn/emmet-vim',
+  'tpope/vim-surround',
+  'tpope/vim-repeat',
+  'rmagatti/auto-session',
 
   -- Git related plugins
   'tpope/vim-fugitive',
-  'tpope/vim-rhubarb',
+  'airblade/vim-gitgutter',
 
   -- Detect tabstop and shiftwidth automatically
   'tpope/vim-sleuth',
+
+  -- NeoVim easymotion
+  {
+    'phaazon/hop.nvim',
+    branch = 'v2',
+    config = function()
+      -- you can configure Hop the way you like here; see :h hop-config
+      require('hop').setup()
+        vim.keymap.set('n', '<leader><space>s', '<cmd>lua require"hop".hint_char1()<cr>')
+        vim.keymap.set('v', '<leader><space>s', '<cmd>lua require"hop".hint_char1()<cr>')
+        vim.keymap.set('n', '<leader><space>S', '<cmd>lua require"hop".hint_char2()<cr>')
+        vim.keymap.set('v', '<leader><space>S', '<cmd>lua require"hop".hint_char2()<cr>')
+        -- keys = 'etovxqpdygfblzhckisuran' 
+    end
+  },
 
   -- NOTE: This is where your plugins related to LSP can be installed.
   --  The configuration is done below. Search for lspconfig to find it below.
@@ -189,23 +213,28 @@ require('lazy').setup({
   --
   --    An additional note is that if you only copied in the `init.lua`, you can just comment this line
   --    to get rid of the warning telling you that there are not plugins in `lua/custom/plugins/`.
-  { import = 'custom.plugins' },
+  -- { import = 'custom.plugins' },
 }, {})
 
 -- [[ Setting options ]]
 -- See `:help vim.o`
 
--- Set highlight on search
-vim.o.hlsearch = false
-
 -- Make line numbers default
-vim.wo.number = true
+vim.api.nvim_create_autocmd("BufEnter", {
+  callback = function()
+    vim.wo.number = true
+    vim.wo.relativenumber = true
+  end,
+})
+vim.api.nvim_create_autocmd("BufLeave", {
+  callback = function()
+    vim.wo.relativenumber = false
+  end,
+})
 
 -- Enable mouse mode
 vim.o.mouse = 'a'
 
--- Sync clipboard between OS and Neovim.
---  Remove this option if you want your OS clipboard to remain independent.
 --  See `:help 'clipboard'`
 vim.o.clipboard = 'unnamedplus'
 
@@ -214,6 +243,9 @@ vim.o.breakindent = true
 
 -- Save undo history
 vim.o.undofile = true
+
+-- Do not create swap file
+vim.opt.swapfile = false
 
 -- Case insensitive searching UNLESS /C or capital in search
 vim.o.ignorecase = true
@@ -237,6 +269,13 @@ vim.o.termguicolors = true
 
 -- Keymaps for better default experience
 -- See `:help vim.keymap.set()`
+vim.keymap.set({'n', 'x'}, 'd', '"_d')
+vim.keymap.set({'n', 'x'}, 'D', '"_D')
+vim.keymap.set({'n', 'x'}, 'x', '"_x')
+vim.keymap.set({'n', 'x'}, 'c', '"_c')
+vim.keymap.set({'n', 'n'}, 'C', '"_C')
+vim.keymap.set({'n', 'x'}, '<leader>d', 'd')
+
 vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
 
 -- Remap for dealing with word wrap
@@ -272,7 +311,7 @@ pcall(require('telescope').load_extension, 'fzf')
 
 -- See `:help telescope.builtin`
 vim.keymap.set('n', '<leader>?', require('telescope.builtin').oldfiles, { desc = '[?] Find recently opened files' })
-vim.keymap.set('n', '<leader><space>', require('telescope.builtin').buffers, { desc = '[ ] Find existing buffers' })
+vim.keymap.set('n', '<leader>;', require('telescope.builtin').buffers, { desc = '[ ] Find existing buffers' })
 vim.keymap.set('n', '<leader>/', function()
   -- You can pass additional configuration to telescope to change theme, layout, etc.
   require('telescope.builtin').current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
@@ -291,10 +330,10 @@ vim.keymap.set('n', '<leader>sd', require('telescope.builtin').diagnostics, { de
 -- See `:help nvim-treesitter`
 require('nvim-treesitter.configs').setup {
   -- Add languages to be installed here that you want installed for treesitter
-  ensure_installed = { 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'tsx', 'typescript', 'help', 'vim' },
+  ensure_installed = {'lua', 'python', 'typescript', 'help', 'vim', 'javascript', 'php' },
 
   -- Autoinstall languages that are not installed. Defaults to false (but you can change for yourself!)
-  auto_install = false,
+  auto_install = true,
 
   highlight = { enable = true },
   indent = { enable = true, disable = { 'python' } },
