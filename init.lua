@@ -1,3 +1,6 @@
+-- Install nodejs npm xclip before install neovim
+-- Store in ~/.config/nvim/
+-- Plugins stored in ~/.local/share/nvim/
 -- From https://github.com/nvim-lua/kickstart.nvim/raw/master/init.lua
 -- Review https://www.youtube.com/watch?v=stqUbv-5u2s
 
@@ -330,7 +333,7 @@ vim.keymap.set('n', '<leader>sd', require('telescope.builtin').diagnostics, { de
 -- See `:help nvim-treesitter`
 require('nvim-treesitter.configs').setup {
   -- Add languages to be installed here that you want installed for treesitter
-  ensure_installed = {'lua', 'python', 'typescript', 'help', 'vim', 'javascript', 'php' },
+  ensure_installed = {'lua', 'python', 'typescript', 'vimdoc', 'vim', 'javascript', 'php', 'pylsp' },
 
   -- Autoinstall languages that are not installed. Defaults to false (but you can change for yourself!)
   auto_install = true,
