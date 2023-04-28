@@ -1,4 +1,6 @@
--- Install nodejs npm xclip before install neovim
+-- nodejs npm xclip unzip fd
+-- pip3 install neovim pylint
+-- install all these before neovim
 -- Store in ~/.config/nvim/
 -- Plugins stored in ~/.local/share/nvim/
 -- From https://github.com/nvim-lua/kickstart.nvim/raw/master/init.lua
@@ -538,6 +540,11 @@ cmp.setup {
     { name = 'nvim_lsp' },
     { name = 'luasnip' },
   },
+}
+
+require('auto-session').setup {
+    auto_save_enabled=true,
+    auto_restore_enabled=true,
 }
 
 -- The line beneath this is called `modeline`. See `:help modeline`
