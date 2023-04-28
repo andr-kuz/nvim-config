@@ -1,4 +1,4 @@
--- nodejs npm xclip unzip fd fzf
+-- nodejs npm xclip unzip fd fzf ripgrep
 -- pip3 install neovim pylint
 -- install all these before neovim
 -- Store in ~/.config/nvim/
