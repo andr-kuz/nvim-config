@@ -1,9 +1,8 @@
--- nodejs npm xclip unzip fd fzf ripgrep
+-- nodejs npm xclip unzip fd
 -- pip3 install neovim pylint
 -- install all these before neovim
 -- Store in ~/.config/nvim/
 -- Plugins stored in ~/.local/share/nvim/
-
 -- From https://github.com/nvim-lua/kickstart.nvim/raw/master/init.lua
 -- Review https://www.youtube.com/watch?v=stqUbv-5u2s
 
