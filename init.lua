@@ -1,4 +1,5 @@
--- nodejs npm xclip unzip fd
+-- sudo pacman -S nodejs npm xclip unzip fd
+-- npm install -g intelephense
 -- pip3 install neovim pylint
 -- install all these before neovim
 -- Store in ~/.config/nvim/
@@ -76,7 +77,13 @@ vim.opt.rtp:prepend(lazypath)
 --    as they will be available in your neovim runtime.
 require('lazy').setup({
   -- NOTE: First, some plugins that don't require any configuration
-  'windwp/nvim-autopairs',
+  {
+    'windwp/nvim-autopairs',
+    event = "InsertEnter",
+    opts = {} -- this is equalent to setup({}) function
+  },
+  -- 'windwp/nvim-autopairs',
+  'prabirshrestha/async.vim',
   'kenn7/vim-arsync',
   'mattn/emmet-vim',
   'tpope/vim-surround',
@@ -114,9 +121,6 @@ require('lazy').setup({
       'williamboman/mason.nvim',
       'williamboman/mason-lspconfig.nvim',
 
-      -- Useful status updates for LSP
-      -- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
-      { 'j-hui/fidget.nvim', opts = {} },
 
       -- Additional lua configuration, makes nvim stuff amazing!
       'folke/neodev.nvim',
@@ -129,7 +133,7 @@ require('lazy').setup({
   },
 
   -- Useful plugin to show you pending keybinds.
-  { 'folke/which-key.nvim', opts = {} },
+  { 'folke/which-key.nvim', opts = {}},
   { -- Adds git releated signs to the gutter, as well as utilities for managing changes
     'lewis6991/gitsigns.nvim',
     opts = {
@@ -477,7 +481,7 @@ capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
 
 -- Setup mason so it can manage external tooling
 require('mason').setup {
-  ensure_installed = {"pylsp", "pyright"},
+  ensure_installed = {"pylsp", "pyright", "intelephense", "phpstan"},
 }
 
 -- Ensure the servers above are installed
