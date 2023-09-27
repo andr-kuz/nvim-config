@@ -1,4 +1,4 @@
--- sudo pacman -S nodejs npm xclip unzip fd
+-- sudo pacman -S nodejs npm xclip unzip fd cmake ripgrep composer
 -- npm install -g intelephense
 -- pip3 install neovim pylint
 -- install all these before neovim
@@ -153,7 +153,7 @@ require('lazy').setup({
     priority = 1000,
     name = 'catppuccin',
     config = function()
-      vim.cmd.colorscheme 'catppuccin-latte'
+      vim.cmd.colorscheme 'catppuccin-frappe'
     end,
   },
 
@@ -193,10 +193,7 @@ require('lazy').setup({
     'nvim-telescope/telescope-fzf-native.nvim',
     -- NOTE: If you are having trouble with this installation,
     --       refer to the README for telescope-fzf-native for more instructions.
-    build = 'make',
-    cond = function()
-      return vim.fn.executable 'make' == 1
-    end,
+    build = 'cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build',
   },
 
   { -- Highlight, edit, and navigate code
