@@ -1,5 +1,5 @@
 -- sudo pacman -S nodejs npm xclip unzip fd cmake ripgrep composer
--- npm install -g intelephense
+-- sudo npm install -g intelephense
 -- pip3 install neovim pylint
 -- install all these before neovim
 -- Store in ~/.config/nvim/
@@ -174,10 +174,11 @@ require('lazy').setup({
     'lukas-reineke/indent-blankline.nvim',
     -- Enable `lukas-reineke/indent-blankline.nvim`
     -- See `:help indent_blankline.txt`
-    opts = {
+    main = "ibl",
+    indent = {
       char = '┊',
-      show_trailing_blankline_indent = false,
-    },
+      show_trailing_blankline_indent = false
+    }
   },
 
   -- "gc" to comment visual regions/lines
