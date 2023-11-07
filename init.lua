@@ -1,4 +1,4 @@
--- sudo pacman -S nodejs npm xclip unzip fd cmake ripgrep composer
+-- sudo pacman -S nodejs npm xclip unzip fd cmake ripgrep composer sshpass
 -- sudo npm install -g intelephense
 -- pip3 install neovim pylint
 -- install all these before neovim
