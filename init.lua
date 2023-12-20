@@ -1,4 +1,4 @@
--- sudo pacman -S nodejs npm xclip unzip fd cmake ripgrep composer sshpass
+-- sudo pacman -S nodejs npm xclip unzip fd cmake ripgrep composer
 -- sudo npm install -g intelephense
 -- pip3 install neovim pylint
 -- install all these before neovim
@@ -82,7 +82,6 @@ require('lazy').setup({
     event = "InsertEnter",
     opts = {} -- this is equalent to setup({}) function
   },
-  -- 'windwp/nvim-autopairs',
   'prabirshrestha/async.vim',
   'kenn7/vim-arsync',
   'mattn/emmet-vim',
@@ -505,6 +504,40 @@ local cmp = require 'cmp'
 local luasnip = require 'luasnip'
 
 luasnip.config.setup {}
+
+-- nvim rsync to host related to banch's name
+function GetCommandOutput(command)
+  local handle = io.popen(command)
+  local output = handle:read("*a")
+  handle:close()
+  return output
+end
+
+function GetCurrentWorkingFolderName()
+    local working_dir = vim.loop.cwd()
+    return working_dir:match("[^/]+$")
+end
+
+function ArsyncDiffsCanape()
+    local branch_name = GetCommandOutput('git branch --show-current'):gsub("[\n\r]", "")
+    local changed_files = GetCommandOutput('git status -s | grep -E "^A|^ M" | cut -c 4-'):gsub("[\n\r]", " ")
+    local folder_name = GetCurrentWorkingFolderName()
+    local rsync_command = string.format('rsync -R %s %s:www/%s.%s', changed_files, folder_name, branch_name, folder_name)
+    return rsync_command
+end
+
+vim.keymap.set({'n', 'v', 'i'}, '<F5>', string.format('<cmd>!%s<cr>', ArsyncDiffsCanape()))
+
+-- vim.api.nvim_create_user_command(
+--     'Test',
+--     function()
+--         local branch_name = getCommandOutput('git branch --show-current')
+--         local changed_files = getCommandOutput('git status -s | grep -E "^A|^ M" | cut -c 4-')
+--         local rsync_command = string.format('rsync -R $(%s) ~/Desktop/test/%s/', changed_files, branch_name)
+--         return rsync_command
+--     end,
+--     { nargs = '?' }
+-- )
 
 cmp.setup {
   snippet = {
