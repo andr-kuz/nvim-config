@@ -528,17 +528,6 @@ end
 
 vim.keymap.set({'n', 'v', 'i'}, '<F5>', string.format('<cmd>!%s<cr>', ArsyncDiffsCanape()))
 
--- vim.api.nvim_create_user_command(
---     'Test',
---     function()
---         local branch_name = getCommandOutput('git branch --show-current')
---         local changed_files = getCommandOutput('git status -s | grep -E "^A|^ M" | cut -c 4-')
---         local rsync_command = string.format('rsync -R $(%s) ~/Desktop/test/%s/', changed_files, branch_name)
---         return rsync_command
---     end,
---     { nargs = '?' }
--- )
-
 cmp.setup {
   snippet = {
     expand = function(args)
