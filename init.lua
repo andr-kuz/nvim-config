@@ -205,6 +205,36 @@ require('lazy').setup({
       pcall(require('nvim-treesitter.install').update { with_sync = true })
     end,
   },
+  {
+    'epwalsh/obsidian.nvim',
+    version = '*',  -- recommended, use latest release instead of latest commit
+    lazy = true,
+    event = {
+      -- If you want to use the home shortcut '~' here you need to call 'vim.fn.expand'.
+      -- E.g. "BufReadPre " .. vim.fn.expand "~" .. "/my-vault/**.md"
+      'BufReadPre ' .. vim.fn.expand '~' .. '/Dropbox/Zettel/**.md',
+      'BufNewFile ' .. vim.fn.expand '~' .. '/Dropbox/Zettel/**.md',
+    },
+    dependencies = {
+      -- Required.
+      'nvim-lua/plenary.nvim',
+    },
+    opts = {
+      workspaces = {
+        {
+          name = 'personal',
+          path = '~/Dropbox/Zettel/',
+        }
+      },
+      finder = 'telescope.nvim',
+      note_id_func = function(title)
+        -- Create note IDs in a Zettelkasten format with a timestamp and a suffix.
+        -- In this case a note with the title 'My new note' will be given an ID that looks
+        -- like '1657296016-my-new-note', and therefore the file name '1657296016-my-new-note.md'
+        return tostring(title)
+      end,
+    },
+  },
 
   -- NOTE: Next Step on Your Neovim Journey: Add/Configure additional "plugins" for kickstart
   --       These are some example plugins that I've included in the kickstart repository.
@@ -337,7 +367,7 @@ vim.keymap.set('n', '<leader>sd', require('telescope.builtin').diagnostics, { de
 -- See `:help nvim-treesitter`
 require('nvim-treesitter.configs').setup {
   -- Add languages to be installed here that you want installed for treesitter
-  ensure_installed = {'lua', 'python', 'typescript', 'vimdoc', 'vim', 'javascript', 'php'},
+  ensure_installed = {'lua', 'python', 'typescript', 'vimdoc', 'vim', 'javascript', 'php', 'markdown', 'markdown_inline'},
 
   -- Autoinstall languages that are not installed. Defaults to false (but you can change for yourself!)
   auto_install = true,
