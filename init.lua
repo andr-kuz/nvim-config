@@ -1,8 +1,8 @@
 -- sudo pacman -S nodejs npm xclip unzip fd cmake ripgrep composer
--- sudo npm install -g intelephense
--- pip3 install neovim pylint
+-- sudo npm install -g intelephense tree-sitter-cli
+-- sudo pacman -S python-neovim python-pylint (pip3 install neovim pylint)
 -- install all these before neovim
--- Store in ~/.config/nvim/
+-- Stores in ~/.config/nvim/
 -- Plugins stored in ~/.local/share/nvim/
 -- From https://github.com/nvim-lua/kickstart.nvim/raw/master/init.lua
 -- Review https://www.youtube.com/watch?v=stqUbv-5u2s
@@ -69,6 +69,12 @@ if not vim.loop.fs_stat(lazypath) then
   }
 end
 vim.opt.rtp:prepend(lazypath)
+
+vim.filetype.add({
+    extension = {
+        tpl = 'php',
+    },
+})
 
 -- NOTE: Here is where you install your plugins.
 --  You can configure plugins using the `config` key.
@@ -210,8 +216,8 @@ require('lazy').setup({
     event = {
       -- If you want to use the home shortcut '~' here you need to call 'vim.fn.expand'.
       -- E.g. "BufReadPre " .. vim.fn.expand "~" .. "/my-vault/**.md"
-      'BufReadPre ' .. vim.fn.expand '~' .. '/Dropbox/Zettel/**.md',
-      'BufNewFile ' .. vim.fn.expand '~' .. '/Dropbox/Zettel/**.md',
+      'BufReadPre ' .. vim.fn.expand '~' .. '/Zettel/**.md',
+      'BufNewFile ' .. vim.fn.expand '~' .. '/Zettel/**.md',
     },
     dependencies = {
       -- Required.
@@ -221,7 +227,7 @@ require('lazy').setup({
       workspaces = {
         {
           name = 'personal',
-          path = '~/Dropbox/Zettel/',
+          path = '~/Zettel/',
         }
       },
       finder = 'telescope.nvim',
@@ -281,6 +287,9 @@ vim.o.undofile = true
 
 -- Do not create swap file
 vim.opt.swapfile = false
+
+-- Replace some symbols. For obsidian plugin
+vim.opt.conceallevel = 2
 
 -- Case insensitive searching UNLESS /C or capital in search
 vim.o.ignorecase = true
