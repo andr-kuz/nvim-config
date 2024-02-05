@@ -88,6 +88,7 @@ require('lazy').setup({
     event = "InsertEnter",
     opts = {} -- this is equalent to setup({}) function
   },
+  'Pocco81/auto-save.nvim',
   'prabirshrestha/async.vim',
   'kenn7/vim-arsync',
   'mattn/emmet-vim',
