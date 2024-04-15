@@ -186,8 +186,8 @@ require('lazy').setup({
     event = {
       -- If you want to use the home shortcut '~' here you need to call 'vim.fn.expand'.
       -- E.g. "BufReadPre " .. vim.fn.expand "~" .. "/my-vault/**.md"
-      'BufReadPre ' .. vim.fn.expand '~' .. '/Zettel/**.md',
-      'BufNewFile ' .. vim.fn.expand '~' .. '/Zettel/**.md',
+      'BufReadPre ' .. vim.fn.expand '/mnt/c/Users/awaku/Zettel/',
+      'BufNewFile ' .. vim.fn.expand '/mnt/c/Users/awaku/Zettel/',
     },
     dependencies = {
       -- Required.
@@ -197,7 +197,7 @@ require('lazy').setup({
       workspaces = {
         {
           name = 'personal',
-          path = '~/Zettel/',
+          path = '/mnt/c/Users/awaku/Zettel/',
         }
       },
       finder = 'telescope.nvim',
@@ -339,7 +339,7 @@ vim.keymap.set('n', '<leader>sd', require('telescope.builtin').diagnostics, { de
 -- See `:help nvim-treesitter`
 require('nvim-treesitter.configs').setup {
   -- Add languages to be installed here that you want installed for treesitter
-  ensure_installed = {'lua', 'python', 'typescript', 'vimdoc', 'vim', 'javascript', 'php', 'markdown', 'markdown_inline'},
+  ensure_installed = {'c', 'lua', 'vim', 'vimdoc', 'query', 'python', 'typescript', 'javascript', 'php', 'markdown', 'markdown_inline'},
 
   -- Autoinstall languages that are not installed. Defaults to false (but you can change for yourself!)
   auto_install = true,
