@@ -1,4 +1,3 @@
--- sudo apt install nodejs npm xclip unzip fd-find cmake ripgrep composer
 -- sudo pacman -S nodejs npm xclip unzip fd cmake ripgrep composer
 -- sudo npm install -g intelephense tree-sitter-cli
 -- sudo pacman -S python-neovim python-pylint (pip3 install neovim pylint)
@@ -6,15 +5,44 @@
 -- Stores in ~/.config/nvim/
 -- Plugins stored in ~/.local/share/nvim/
 -- From https://github.com/nvim-lua/kickstart.nvim/raw/master/init.lua
--- Video https://www.youtube.com/watch?v=stqUbv-5u2s
+-- Review https://www.youtube.com/watch?v=stqUbv-5u2s
 
 --[[
+
+=====================================================================
+==================== READ THIS BEFORE CONTINUING ====================
+=====================================================================
+
+Kickstart.nvim is *not* a distribution.
+
 Kickstart.nvim is a template for your own configuration.
+  The goal is that you can read every line of code, top-to-bottom, and understand
+  what your configuration is doing.
+
+  Once you've done that, you should start exploring, configuring and tinkering to
+  explore Neovim!
+
   If you don't know anything about Lua, I recommend taking some time to read through
   a guide. One possible example:
   - https://learnxinyminutes.com/docs/lua/
 
   And then you can explore or search through `:help lua-guide`
+
+
+Kickstart Guide:
+
+I have left several `:help X` comments throughout the init.lua
+You should run that command and read that help section for more information.
+
+In addition, I have some `NOTE:` items throughout the file.
+These are for you, the reader to help understand what is happening. Feel free to delete
+them once you know what you're doing, but they should serve as a guide for when you
+are first encountering a few different constructs in your nvim config.
+
+I hope you enjoy your Neovim journey,
+- TJ
+
+P.S. You can delete this when you're done too. It's your config now :)
 --]]
 
 -- Set <space> as the leader key
@@ -22,6 +50,11 @@ Kickstart.nvim is a template for your own configuration.
 --  NOTE: Must happen before plugins are required (otherwise wrong leader will be used)
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
+-- vim.cmd[[autocmd TextChanged,FocusLost,BufEnter * silent update]]
+vim.cmd[[autocmd TextChanged,FocusLost,BufEnter * if &buftype ==# '' || &buftype == 'acwrite' | silent update | endif]]
+
+-- Use zsh as a default shell
+vim.opt.shell = '/usr/bin/zsh'
 
 -- Install package manager
 --    https://github.com/folke/lazy.nvim
@@ -86,6 +119,55 @@ require('lazy').setup({
         -- keys = 'etovxqpdygfblzhckisuran' 
     end
   },
+  {
+    "nomnivore/ollama.nvim",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+    },
+
+    -- All the user commands added by the plugin
+    cmd = { "Ollama", "OllamaModel", "OllamaServe", "OllamaServeStop" },
+
+    keys = {
+      -- Sample keybind for prompt menu. Note that the <c-u> is important for selections to work properly.
+      {
+        "<leader>aa",
+        ":<c-u>lua require('ollama').prompt()<cr>",
+        desc = "ollama prompt",
+        mode = { "n", "v" },
+      },
+
+      -- Sample keybind for direct prompting. Note that the <c-u> is important for selections to work properly.
+      {
+        "<leader>aG",
+        ":<c-u>lua require('ollama').prompt('Generate_Code')<cr>",
+        desc = "ollama Generate Code",
+        mode = { "n", "v" },
+      },
+    },
+
+    ---@type Ollama.Config
+    opts = {
+      model = "llama3",
+      url = "http://127.0.0.1:11434",
+      serve = {
+        on_start = false,
+        command = "ollama",
+        args = { "serve" },
+        stop_command = "pkill",
+        stop_args = { "-SIGTERM", "ollama" },
+      },
+      -- View the actual default prompts in ./lua/ollama/prompts.lua
+      prompts = {
+        Sample_Prompt = {
+          prompt = "This is a sample prompt that receives $input and $sel(ection), among others.",
+          input_label = "> ",
+          model = "mistral",
+          action = "display",
+        }
+      }
+    }
+  },
 
   -- NOTE: This is where your plugins related to LSP can be installed.
   --  The configuration is done below. Search for lspconfig to find it below.
@@ -95,6 +177,7 @@ require('lazy').setup({
       -- Automatically install LSPs to stdpath for neovim
       'williamboman/mason.nvim',
       'williamboman/mason-lspconfig.nvim',
+
 
       -- Additional lua configuration, makes nvim stuff amazing!
       'folke/neodev.nvim',
@@ -185,8 +268,8 @@ require('lazy').setup({
     event = {
       -- If you want to use the home shortcut '~' here you need to call 'vim.fn.expand'.
       -- E.g. "BufReadPre " .. vim.fn.expand "~" .. "/my-vault/**.md"
-      'BufReadPre ' .. vim.fn.expand '/mnt/c/Users/awaku/Zettel/',
-      'BufNewFile ' .. vim.fn.expand '/mnt/c/Users/awaku/Zettel/',
+      'BufReadPre ' .. vim.fn.expand '~' .. '/Zettel/**.md',
+      'BufNewFile ' .. vim.fn.expand '~' .. '/Zettel/**.md',
     },
     dependencies = {
       -- Required.
@@ -196,8 +279,12 @@ require('lazy').setup({
       workspaces = {
         {
           name = 'personal',
-          path = '/mnt/c/Users/awaku/Zettel/',
-        }
+          path = '~/Zettel/',
+        },
+        {
+          name = 'steam',
+          path = '~/SteamZettel/',
+        },
       },
       finder = 'telescope.nvim',
       note_id_func = function(title)
@@ -206,8 +293,27 @@ require('lazy').setup({
         -- like '1657296016-my-new-note', and therefore the file name '1657296016-my-new-note.md'
         return tostring(title)
       end,
+        -- Optional, alternatively you can customize the frontmatter data.
+      note_frontmatter_func = function(note)
+        -- This is equivalent to the default frontmatter function.
+        local out = { aliases = note.aliases, tags = note.tags, links = note.links }
+        -- `note.metadata` contains any manually added fields in the frontmatter.
+        -- So here we just make sure those fields are kept in the frontmatter.
+        if note.metadata ~= nil and not vim.tbl_isempty(note.metadata) then
+          for k, v in pairs(note.metadata) do
+            out[k] = v
+          end
+        end
+        return out
+      end,
     },
   },
+
+  -- NOTE: Next Step on Your Neovim Journey: Add/Configure additional "plugins" for kickstart
+  --       These are some example plugins that I've included in the kickstart repository.
+  --       Uncomment any of the lines below to enable them.
+  -- require 'kickstart.plugins.autoformat',
+  -- require 'kickstart.plugins.debug',
 
   -- NOTE: The import below automatically adds your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
   --    You can use this folder to prevent any conflicts with this init.lua if you're interested in keeping
@@ -236,9 +342,11 @@ vim.api.nvim_create_autocmd("BufLeave", {
   end,
 })
 
+-- Enable mouse mode
 vim.o.mouse = 'a'
+
+--  See `:help 'clipboard'`
 vim.o.clipboard = 'unnamedplus'
-vim.o.termguicolors = true
 
 -- Enable break indent
 vim.o.breakindent = true
@@ -266,6 +374,9 @@ vim.o.timeoutlen = 300
 
 -- Set completeopt to have a better completion experience
 vim.o.completeopt = 'menuone,noselect'
+
+-- NOTE: You should make sure your terminal supports this
+vim.o.termguicolors = true
 
 -- [[ Basic Keymaps ]]
 
@@ -332,13 +443,13 @@ vim.keymap.set('n', '<leader>sd', require('telescope.builtin').diagnostics, { de
 -- See `:help nvim-treesitter`
 require('nvim-treesitter.configs').setup {
   -- Add languages to be installed here that you want installed for treesitter
-  ensure_installed = {'c', 'lua', 'vim', 'vimdoc', 'query', 'python', 'typescript', 'javascript', 'php', 'markdown', 'markdown_inline'},
+  ensure_installed = {'lua', 'python', 'typescript', 'vimdoc', 'vim', 'javascript', 'php', 'markdown', 'markdown_inline'},
 
   -- Autoinstall languages that are not installed. Defaults to false (but you can change for yourself!)
   auto_install = true,
 
   highlight = { enable = true },
-  indent = { enable = true },
+  indent = { enable = true, disable = { 'python' } },
   incremental_selection = {
     enable = true,
     keymaps = {
@@ -474,7 +585,7 @@ capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
 
 -- Setup mason so it can manage external tooling
 require('mason').setup {
-  ensure_installed = {"pylsp", "pyright", "intelephense", "phpstan", "phpactor"},
+  ensure_installed = {"python-lsp-server", "pyright", "intelephense", "phpstan", "phpactor"},
 }
 
 -- Ensure the servers above are installed
