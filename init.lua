@@ -7,50 +7,10 @@
 -- From https://github.com/nvim-lua/kickstart.nvim/raw/master/init.lua
 -- Review https://www.youtube.com/watch?v=stqUbv-5u2s
 
---[[
-
-=====================================================================
-==================== READ THIS BEFORE CONTINUING ====================
-=====================================================================
-
-Kickstart.nvim is *not* a distribution.
-
-Kickstart.nvim is a template for your own configuration.
-  The goal is that you can read every line of code, top-to-bottom, and understand
-  what your configuration is doing.
-
-  Once you've done that, you should start exploring, configuring and tinkering to
-  explore Neovim!
-
-  If you don't know anything about Lua, I recommend taking some time to read through
-  a guide. One possible example:
-  - https://learnxinyminutes.com/docs/lua/
-
-  And then you can explore or search through `:help lua-guide`
-
-
-Kickstart Guide:
-
-I have left several `:help X` comments throughout the init.lua
-You should run that command and read that help section for more information.
-
-In addition, I have some `NOTE:` items throughout the file.
-These are for you, the reader to help understand what is happening. Feel free to delete
-them once you know what you're doing, but they should serve as a guide for when you
-are first encountering a few different constructs in your nvim config.
-
-I hope you enjoy your Neovim journey,
-- TJ
-
-P.S. You can delete this when you're done too. It's your config now :)
---]]
-
--- Set <space> as the leader key
--- See `:help mapleader`
 --  NOTE: Must happen before plugins are required (otherwise wrong leader will be used)
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
--- vim.cmd[[autocmd TextChanged,FocusLost,BufEnter * silent update]]
+vim.keymap.set('n', '<leader>pv', vim.cmd.Sex)
 vim.cmd[[autocmd TextChanged,FocusLost,BufEnter * if &buftype ==# '' || &buftype == 'acwrite' | silent update | endif]]
 
 -- Use zsh as a default shell
@@ -90,9 +50,6 @@ require('lazy').setup({
     event = "InsertEnter",
     opts = {} -- this is equalent to setup({}) function
   },
-  'Pocco81/auto-save.nvim',
-  'prabirshrestha/async.vim',
-  'kenn7/vim-arsync',
   'mattn/emmet-vim',
   'tpope/vim-surround',
   'tpope/vim-repeat',
@@ -100,25 +57,10 @@ require('lazy').setup({
 
   -- Git related plugins
   'tpope/vim-fugitive',
-  'airblade/vim-gitgutter',
 
   -- Detect tabstop and shiftwidth automatically
   'tpope/vim-sleuth',
 
-  -- NeoVim easymotion
-  {
-    'phaazon/hop.nvim',
-    branch = 'v2',
-    config = function()
-      -- you can configure Hop the way you like here; see :h hop-config
-      require('hop').setup()
-        vim.keymap.set('n', '<leader><space>s', '<cmd>lua require"hop".hint_char1()<cr>')
-        vim.keymap.set('v', '<leader><space>s', '<cmd>lua require"hop".hint_char1()<cr>')
-        vim.keymap.set('n', '<leader><space>S', '<cmd>lua require"hop".hint_char2()<cr>')
-        vim.keymap.set('v', '<leader><space>S', '<cmd>lua require"hop".hint_char2()<cr>')
-        -- keys = 'etovxqpdygfblzhckisuran' 
-    end
-  },
   {
     "nomnivore/ollama.nvim",
     dependencies = {
@@ -261,53 +203,6 @@ require('lazy').setup({
       pcall(require('nvim-treesitter.install').update { with_sync = true })
     end,
   },
-  {
-    'epwalsh/obsidian.nvim',
-    version = '*',  -- recommended, use latest release instead of latest commit
-    lazy = true,
-    event = {
-      -- If you want to use the home shortcut '~' here you need to call 'vim.fn.expand'.
-      -- E.g. "BufReadPre " .. vim.fn.expand "~" .. "/my-vault/**.md"
-      'BufReadPre ' .. vim.fn.expand '~' .. '/Zettel/**.md',
-      'BufNewFile ' .. vim.fn.expand '~' .. '/Zettel/**.md',
-    },
-    dependencies = {
-      -- Required.
-      'nvim-lua/plenary.nvim',
-    },
-    opts = {
-      workspaces = {
-        {
-          name = 'personal',
-          path = '~/Zettel/',
-        },
-        {
-          name = 'steam',
-          path = '~/SteamZettel/',
-        },
-      },
-      finder = 'telescope.nvim',
-      note_id_func = function(title)
-        -- Create note IDs in a Zettelkasten format with a timestamp and a suffix.
-        -- In this case a note with the title 'My new note' will be given an ID that looks
-        -- like '1657296016-my-new-note', and therefore the file name '1657296016-my-new-note.md'
-        return tostring(title)
-      end,
-        -- Optional, alternatively you can customize the frontmatter data.
-      note_frontmatter_func = function(note)
-        -- This is equivalent to the default frontmatter function.
-        local out = { aliases = note.aliases, tags = note.tags, links = note.links }
-        -- `note.metadata` contains any manually added fields in the frontmatter.
-        -- So here we just make sure those fields are kept in the frontmatter.
-        if note.metadata ~= nil and not vim.tbl_isempty(note.metadata) then
-          for k, v in pairs(note.metadata) do
-            out[k] = v
-          end
-        end
-        return out
-      end,
-    },
-  },
 
   -- NOTE: Next Step on Your Neovim Journey: Add/Configure additional "plugins" for kickstart
   --       These are some example plugins that I've included in the kickstart repository.
@@ -423,21 +318,9 @@ require('telescope').setup {
 pcall(require('telescope').load_extension, 'fzf')
 
 -- See `:help telescope.builtin`
-vim.keymap.set('n', '<leader>?', require('telescope.builtin').oldfiles, { desc = '[?] Find recently opened files' })
 vim.keymap.set('n', '<leader>;', require('telescope.builtin').buffers, { desc = '[ ] Find existing buffers' })
-vim.keymap.set('n', '<leader>/', function()
-  -- You can pass additional configuration to telescope to change theme, layout, etc.
-  require('telescope.builtin').current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
-    winblend = 10,
-    previewer = false,
-  })
-end, { desc = '[/] Fuzzily search in current buffer' })
-
 vim.keymap.set('n', '<leader>sf', require('telescope.builtin').find_files, { desc = '[S]earch [F]iles' })
-vim.keymap.set('n', '<leader>sh', require('telescope.builtin').help_tags, { desc = '[S]earch [H]elp' })
-vim.keymap.set('n', '<leader>sw', require('telescope.builtin').grep_string, { desc = '[S]earch current [W]ord' })
 vim.keymap.set('n', '<leader>sg', require('telescope.builtin').live_grep, { desc = '[S]earch by [G]rep' })
-vim.keymap.set('n', '<leader>sd', require('telescope.builtin').diagnostics, { desc = '[S]earch [D]iagnostics' })
 
 -- [[ Configure Treesitter ]]
 -- See `:help nvim-treesitter`
@@ -506,9 +389,6 @@ require('nvim-treesitter.configs').setup {
 }
 
 -- Diagnostic keymaps
-vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = "Go to previous diagnostic message" })
-vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = "Go to next diagnostic message" })
-vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = "Open floating diagnostic message" })
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = "Open diagnostics list" })
 
 -- LSP settings.
@@ -540,15 +420,9 @@ local on_attach = function(_, bufnr)
 
   -- See `:help K` for why this keymap
   nmap('K', vim.lsp.buf.hover, 'Hover Documentation')
-  nmap('<C-k>', vim.lsp.buf.signature_help, 'Signature Documentation')
 
   -- Lesser used LSP functionality
   nmap('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
-  nmap('<leader>wa', vim.lsp.buf.add_workspace_folder, '[W]orkspace [A]dd Folder')
-  nmap('<leader>wr', vim.lsp.buf.remove_workspace_folder, '[W]orkspace [R]emove Folder')
-  nmap('<leader>wl', function()
-    print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
-  end, '[W]orkspace [L]ist Folders')
 
   -- Create a command `:Format` local to the LSP buffer
   vim.api.nvim_buf_create_user_command(bufnr, 'Format', function(_)
@@ -585,7 +459,7 @@ capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
 
 -- Setup mason so it can manage external tooling
 require('mason').setup {
-  ensure_installed = {"python-lsp-server", "pyright", "intelephense", "phpstan", "phpactor"},
+  ensure_installed = {"python-lsp-server", "pyright"},
 }
 
 -- Ensure the servers above are installed
@@ -610,29 +484,6 @@ local cmp = require 'cmp'
 local luasnip = require 'luasnip'
 
 luasnip.config.setup {}
-
--- nvim rsync to host related to banch's name
-function GetCommandOutput(command)
-  local handle = io.popen(command)
-  local output = handle:read("*a")
-  handle:close()
-  return output
-end
-
-function GetCurrentWorkingFolderName()
-    local working_dir = vim.loop.cwd()
-    return working_dir:match("[^/]+$")
-end
-
-function ArsyncDiffsCanape()
-    local branch_name = GetCommandOutput('git branch --show-current'):gsub("[\n\r]", "")
-    local changed_files = GetCommandOutput('git status -s | grep -E "^A|^ M" | cut -c 4-'):gsub("[\n\r]", " ")
-    local folder_name = GetCurrentWorkingFolderName()
-    local rsync_command = string.format('rsync -R %s %s:www/%s.%s', changed_files, folder_name, branch_name, folder_name)
-    return rsync_command
-end
-
-vim.keymap.set({'n', 'v', 'i'}, '<F5>', string.format('<cmd>!%s<cr>', ArsyncDiffsCanape()))
 
 cmp.setup {
   snippet = {
